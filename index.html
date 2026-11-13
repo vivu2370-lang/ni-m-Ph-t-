@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Niệm Phật Thanh Tịnh - TikTok Live</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #121212; color: #ffffff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        .live-container { 
+            width: 100%; 
+            max-width: 480px; 
+            height: 100vh; 
+            background: linear-gradient(135deg, #1f1b18, #0a0807); 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.8); 
+        }
+
+        /* Header */
+        .live-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(0, 0, 0, 0.5); z-index: 10; }
+        .streamer-info { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #ffd700; background: #333; }
+        .streamer-name font { font-weight: bold; font-size: 14px; color: #ffd700; }
+        .streamer-name p { font-size: 11px; color: #ccc; }
+        
+        .header-right { display: flex; gap: 8px; align-items: center; }
+        .btn-follow { background: #ff3366; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer; }
+        .btn-admin-toggle { background: rgba(255,255,255,0.2); color: #ffd700; border: none; padding: 6px 10px; border-radius: 20px; font-size: 11px; cursor: pointer; }
+
+        /* Màn hình chính thanh tịnh */
+        .stage { flex: 1; position: relative; background: radial-gradient(circle, #3d2c1e 0%, #1a120b 100%); display: flex; flex-direction: column; align-items: center; padding-top: 8px; overflow: hidden; gap: 5px; }
+        
+        /* Banner Thầy Sư Niệm Phật */
+        .buddha-banner {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #ffd700;
+            border-radius: 8px;
+            padding: 5px 10px;
+            text-align: center;
+            width: 92%;
+            box-shadow: 0 0 10px rgba(255,215,0,0.3);
+        }
+        .buddha-banner h3 { color: #ffd700; font-size: 11px; text-shadow: 0 0 6px rgba(255,215,0,0.6); margin-bottom: 2px; }
+        .buddha-banner p { color: #e6ccb2; font-size: 9px; font-style: italic; }
+
+        /* Bảng giá xu phước báu mới */
+        .price-board {
+            background: rgba(80, 50, 20, 0.7);
+            border: 1.5px dashed #ffd700;
+            border-radius: 6px;
+            padding: 4px 8px;
+            width: 92%;
+            display: flex;
+            justify-content: space-around;
+            font-size: 10px;
+            color: #ffd700;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        /* 2 Bảng xếp hạng tự động cuộn */
+        .boards-container { display: flex; width: 92%; justify-content: space-between; gap: 8px; z-index: 2; }
+        .scoreboard { background: rgba(20, 35, 20, 0.9); border: 2px solid #c5a059; border-radius: 6px; padding: 5px; width: 50%; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .scoreboard h4 { color: #ffd700; font-size: 10px; margin-bottom: 3px; text-shadow: 1px 1px 2px #000; }
+        
+        /* Vùng chứa danh sách tự động lướt */
+        .rank-scroll-box { height: 42px; overflow: hidden; position: relative; }
+        .rank-list { list-style: none; font-size: 9px; text-align: left; position: absolute; width: 100%; transition: transform 0.5s ease; }
+        .rank-item { display: flex; justify-content: space-between; padding: 2px 0; border-bottom: 1px dashed rgba(255,255,255,0.15); }
+
+        /* Hàng ghế niệm phật & Thắp hương */
+        .seating-area { position: absolute; bottom: 10px; width: 100%; display: flex; flex-direction: column; gap: 20px; align-items: center; }
+        .row-seat { width: 90%; background: #5c3a21; height: 14px; border-radius: 4px; border-top: 2px solid #8c5836; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
+        
+        .seat-item { position: absolute; top: -26px; display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); animation: bounceIn 0.4s ease; }
+        .incense-stick { font-size: 12px; margin-bottom: -2px; animation: flameGlow 1s infinite alternate; }
+        @keyframes flameGlow { 0% { opacity: 0.7; transform: scale(1); } 100% { opacity: 1; transform: scale(1.1); } }
+
+        .seat-avatar { width: 20px; height: 20px; background: #ffd700; border-radius: 50%; border: 1px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; color: #000; }
+        .seat-tag { font-size: 8px; background: rgba(0,0,0,0.8); color: #ffd700; padding: 1px 3px; border-radius: 3px; white-space: nowrap; margin-top: 1px; }
+
+        @keyframes bounceIn {
+            0% { transform: translateX(-50%) scale(0); }
+            70% { transform: translateX(-50%) scale(1.2); }
+            100% { transform: translateX(-50%) scale(1); }
+        }
+
+        /* Khung điều khiển */
+        .live-footer { background: rgba(0, 0, 0, 0.9); padding: 10px 15px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
+        .log-box { max-height: 40px; overflow-y: auto; font-size: 10px; display: flex; flex-direction: column; gap: 2px; color: #e6ccb2; }
+        
+        /* Bảng Admin */
+        .admin-panel { background: rgba(90, 20, 20, 0.9); border: 1px solid #ff4d4d; padding: 8px 10px; border-radius: 8px; display: none; flex-direction: column; gap: 5px; }
+        .admin-panel font { font-size: 11px; font-weight: bold; color: #ffcccc; }
+        .admin-row { display: flex; gap: 5px; }
+        .admin-row input, .admin-row select { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid #ff6666; padding: 5px; border-radius: 4px; color: white; font-size: 11px; outline: none; }
+        .btn-admin-action { background: #ffd700; color: #000; border: none; padding: 0 10px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="live-container">
+        <!-- Header -->
+        <div class="live-header">
+            <div class="streamer-info">
+                <div class="avatar"></div>
+                <div class="streamer-name">
+                    <font>Nam Mô A Di Đà Phật 🙏</font>
+                    <p>Phòng Niệm Phật Thanh Tịnh</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn-admin-toggle" onclick="toggleAdmin()">🔒 Admin</button>
+                <button class="btn-follow">+ Follow</button>
+            </div>
+        </div>
+
+        <!-- Màn hình chính -->
+        <div class="stage">
+            <!-- Thầy Sư Niệm Phật & Chúc Sức Khỏe -->
+            <div class="buddha-banner">
+                <h3 id="chantingText">🙏 Nam Mô A Di Đà Phật 🙏</h3>
+                <p id="blessingText">Chúc các con được nhiều sức khỏe mạnh, thân tâm an lạc.</p>
+            </div>
+
+            <!-- Bảng giá xu phước báu -->
+            <div class="price-board">
+                <span>🪷 1 Xu: Vào Phòng Niệm Phật</span>
+                <span>🕯️ ≥ 2 Xu: Thắp Hương Dâng Phật</span>
+            </div>
+
+            <!-- 2 Bảng xếp hạng tự động lướt -->
+            <div class="boards-container">
+                <div class="scoreboard">
+                    <h4>🎁 Top Tặng Xu</h4>
+                    <div class="rank-scroll-box">
+                        <ul class="rank-list" id="rankCoins">
+                            <li class="rank-item"><span>Chưa có</span> <span>0 xu</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="scoreboard">
+                    <h4>⭐ Top Đoán Đúng</h4>
+                    <div class="rank-scroll-box">
+                        <ul class="rank-list" id="rankCorrect">
+                            <li class="rank-item"><span>Chưa có</span> <span>0 câu</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hàng ghế niệm phật & Thắp hương -->
+            <div class="seating-area">
+                <div class="row-seat" id="row1"></div>
+                <div class="row-seat" id="row2"></div>
+                <div class="row-seat" id="row3"></div>
+            </div>
+        </div>
+
+        <!-- Khung điều khiển -->
+        <div class="live-footer">
+            <div class="log-box" id="logBox">
+                <div>🪷 Nam Mô Bản Sư Thích Ca Mâu Ni Phật. Thanh tịnh cõi lòng.</div>
+            </div>
+
+            <!-- Bảng Admin (Mật khẩu: 123456) -->
+            <div class="admin-panel" id="adminPanel">
+                <font>⚡ QUẢN LÝ TẶNG QUÀ & ĐOÁN ĐÚNG</font>
+                <div class="admin-row">
+                    <input type="password" id="adminPass" placeholder="Mật khẩu (123456)...">
+                    <button class="btn-admin-action" onclick="verifyAdmin()">Mở khóa</button>
+                </div>
+                <div class="admin-row" id="adminControls" style="display: none;">
+                    <input type="text" id="adminName" placeholder="ID TikTok...">
+                    <input type="number" id="adminValue" placeholder="Số xu / Số câu" value="2" style="max-width: 60px;">
+                    <select id="adminType" style="max-width: 100px;">
+                        <option value="coins">Tặng Xu/Quà</option>
+                        <option value="correct">Đoán Đúng</option>
+                    </select>
+                    <button class="btn-admin-action" onclick="adminProcess()">Thêm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let participants = [];
+        let isAdminLoggedIn = false;
+
+        function playBellSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(420, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.8);
+
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.8);
+            } catch (e) {
+                console.log("Audio context blocked");
+            }
+        }
+
+        const chants = [
+            { text: "🙏 Nam Mô A Di Đà Phật 🙏", bless: "Chúc các con được nhiều sức khỏe mạnh, bình an." },
+            { text: "🪷 Nam Mô Đại Từ Đại Bi Quan Thế Âm Bồ Tát 🪷", bless: "Nguyện cầu phước lành đến với tất cả mọi người." },
+            { text: "🙏 Nam Mô A Di Đà Phật 🙏", bless: "Tâm tịnh sáng suốt, vạn sự hanh thông." }
+        ];
+        let chantIndex = 0;
+        setInterval(() => {
+            chantIndex = (chantIndex + 1) % chants.length;
+            document.getElementById('chantingText').innerText = chants[chantIndex].text;
+            document.getElementById('blessingText').innerText = chants[chantIndex].bless;
+        }, 5000);
+
+        let scrollIndex = 0;
+        setInterval(() => {
+            scrollIndex++;
+            let lists = document.querySelectorAll('.rank-list');
+            lists.forEach(list => {
+                let itemsCount = list.children.length;
+                if (itemsCount > 2) {
+                    let offset = (scrollIndex % itemsCount) * 15;
+                    list.style.transform = `translateY(-${offset}px)`;
+                }
+            });
+        }, 2500);
+
+        function toggleAdmin() {
+            let panel = document.getElementById('adminPanel');
+            panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function verifyAdmin() {
+            let pass = document.getElementById('adminPass').value;
+            if (pass === '123456') {
+                isAdminLoggedIn = true;
+                document.getElementById('adminControls').style.display = 'flex';
+                alert('Đăng nhập Admin thành công!');
+            } else {
+                alert('Sai mật khẩu!');
+            }
+        }
+
+        function adminProcess() {
+            if (!isAdminLoggedIn) return;
+            let nameInput = document.getElementById('adminName');
+            let valueInput = document.getElementById('adminValue');
+            let typeSelect = document.getElementById('adminType');
+
+            let name = nameInput.value.trim();
+            let val = parseInt(valueInput.value) || 0;
+            let type = typeSelect.value;
+
+            if (name === '') {
+                alert('Vui lòng nhập ID TikTok!');
+                return;
+            }
+
+            if (!name.startsWith('@')) name = '@' + name;
+
+            playBellSound();
+
+            let user = participants.find(p => p.name === name);
+            if (!user) {
+                user = { name: name, coins: 0, correct: 0 };
+                participants.push(user);
+            }
+
+            if (type === 'coins') {
+                user.coins += val;
+                if (val >= 2) {
+                    logMessage(`🕯️ <span style="color:#ffd700;">${name}</span> cúng dường <span style="color:#ffcc00;">${val} xu</span> và được <b style="color:#ff4d4d;">lên thắp hương dâng Phật</b>! 🙏`);
+                } else {
+                    logMessage(`🪷 <span style="color:#ffd700;">${name}</span> cúng dường <span style="color:#ffcc00;">${val} xu</span> và được vào phòng niệm Phật!`);
+                }
+            } else {
+                user.correct += val;
+                logMessage(`⭐ <span style="color:#7fff00;">${name}</span> đoán đúng <span style="color:#7fff00;">+${val} câu</span>!`);
+            }
+
+            updateUI();
+            nameInput.value = '';
+        }
+
+        function logMessage(htmlText) {
+            let logBox = document.getElementById('logBox');
+            logBox.innerHTML += `<div>🪷 ${htmlText}</div>`;
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        function updateUI() {
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`row${i}`).innerHTML = '';
+            }
+
+            participants.forEach((user, index) => {
+                let rowIndex = Math.floor(index / 4) + 1;
+                let rowEl = document.getElementById(`row${rowIndex}`);
+                if (rowEl) {
+                    let pos = (index % 4) * 22 + 16;
+                    let seatDiv = document.createElement('div');
+                    seatDiv.className = 'seat-item';
+                    seatDiv.style.left = pos + '%';
+
+                    let incenseHTML = user.coins >= 2 ? `<div class="incense-stick">🕯️</div>` : ``;
+
+                    seatDiv.innerHTML = `
+                        ${incenseHTML}
+                        <div class="seat-avatar">${user.name.charAt(1).toUpperCase()}</div>
+                        <div class="seat-tag">${user.name}</div>
+                    `;
+                    rowEl.appendChild(seatDiv);
+                }
+            });
+
+            let rankCoins = document.getElementById('rankCoins');
+            let sortedCoins = [...participants].filter(p => p.coins > 0).sort((a, b) => b.coins - a.coins);
+            rankCoins.innerHTML = sortedCoins.length === 0 ? '<li class="rank-item"><span>Chưa có</span> <span>0 xu</span></li>' : '';
+            sortedCoins.forEach((u, idx) => {
+                let li = document.createElement('li');
+                li.className = 'rank-item';
+                li.innerHTML = `<span>${idx + 1}. ${u.name}</span> <span style="color:#ffd700;">${u.coins} xu</span>`;
+                rankCoins.appendChild(li);
+            });
+
+            let rankCorrect = document.getElementById('rankCorrect');
+            let sortedCorrect = [...participants].filter(p => p.correct > 0).sort((a, b) => b.correct - a.correct);
+            rankCorrect.innerHTML = sortedCorrect.length === 0 ? '<li class="rank-item"><span>Chưa có</span> <span>0 câu</span></li>' : '';
+            sortedCorrect.forEach((u, idx) => {
+                let li = document.createElement('li');
+                li.className = 'rank-item';
+                li.innerHTML = `<span>${idx + 1}. ${u.name}</span> <span style="color:#7fff00;">${u.correct} câu</span>`;
+                rankCorrect.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
